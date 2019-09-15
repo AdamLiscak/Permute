@@ -7,7 +7,6 @@ public class Permutations {
     static final int indicator=8;
     static HashSet<Point>[] trace=new HashSet[indicator];
     static ArrayList<Point> points= new ArrayList<>();
-    public static boolean[] forbidden;
     public static void main(String[] args) {
         generatePoints();
         findSubPoints();
@@ -15,9 +14,11 @@ public class Permutations {
         printPoints(points);
       // trace[0].remove(points.get(6));
        // trace[0].remove(points.get(7));
-      // reduceColumn(0);
-      // reduceCombinations();
-       // choosePath();
+       reduceColumn(0);
+       reduceCombinations();
+       choosePath();
+       correctPath();
+       GeneratePoint();
        // trace[0].retainAll(trace[1]);
         printSets();
        // printPoints(findMatches());
@@ -65,7 +66,6 @@ public class Permutations {
             }
         }
         points=pointArrayList;
-        forbidden=new boolean[points.size()];
     }
     public static void findSubPoints()
     {
@@ -254,7 +254,7 @@ public class Permutations {
     }
     static void choosePath()
     {
-        for (int i = 1; i <trace.length-3 ; i++)
+        for (int i = 1; i <trace.length; i++)
         {
             Point point=(Point)trace[i].toArray()[0];
             trace[i].clear();
@@ -267,4 +267,92 @@ public class Permutations {
 
         }
     }
+    static void correctPath()
+    {
+        int a=findDuplicates()[0];
+        int b=findDuplicates()[1];
+        Point missing= findMissing();
+        boolean isB;
+        if(a!=-1&&missing!=null)
+        {
+            Point checkValue = (Point) trace[a].toArray()[0];
+            isB=a==missing.x||a==missing.y;
+            for (int i = 0; i < trace[0].size(); i++)
+            {
+                if(isB)
+                {
+                    trace[b].clear();
+                    trace[b].add(missing);
+                }
+                else
+                {
+                    trace[a].clear();
+                    trace[a].add(missing);
+                }
+            }
+        }
+    }
+    static int[] findDuplicates()
+    {
+        int[] indeces= new int[2];
+        indeces[0]=-1;
+        for (int i = 1; i <trace.length ; i++)
+        {
+            Point p=(Point)trace[i].toArray()[0];
+            for (int j=0;j<trace.length;j++)
+            {
+                if (i!=j&&p.equals((Point)trace[j].toArray()[0]))
+                {
+                    indeces[0]=i;
+                    indeces[1]=j;
+                }
+            }
+        }
+        return indeces;
+    }
+    static Point findMissing()
+    {
+        for (int i = 0; i <trace.length-1; i++)
+        {
+            Point p=(Point)trace[0].toArray()[i];
+            for (int j=1;j<trace.length;j++)
+            {
+                if (p.equals((Point)trace[j].toArray()[0]))
+                {
+                    break;
+                }
+                if(j==trace.length-1&&!p.equals((Point)trace[j].toArray()[0]))
+                {
+                    return p;
+                }
+            }
+        }
+        return null;
+
+    }
+    static void GeneratePoint()
+    {
+        for (int i = 0; i <trace.length-1 ; i++)
+        {
+            Point newPoint= new Point(1,findOccurence(i)+1);
+            if(findOccurence(i)!=-1)
+            {
+                trace[((Point) trace[0].toArray()[i]).x - 1].add(newPoint);
+                trace[((Point) trace[0].toArray()[i]).y - 1].add(newPoint);
+            }
+        }
+    }
+    static int findOccurence(int i)
+    {
+          Point p=(Point)trace[0].toArray()[i];
+          for (int j=1;j<trace.length;j++)
+          {
+                if (p.equals((Point)trace[j].toArray()[0]))
+                  {
+                      return j;
+                  }
+          }
+          return -1;
+    }
 }
+
